@@ -1,86 +1,45 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useRef, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
-import { ShaderMaterial } from 'three';
+import * as THREE from 'three';
 
-type WindowSizeType = {
-  width: number | undefined;
-  height: number | undefined;
-};
-
-function Box({
-  props,
-  windowSize,
-}: {
-  props: any;
-  windowSize: WindowSizeType;
-}) {
-  const shaderRef = useRef<ShaderMaterial | null>(null);
-  useFrame(() => {
+function Box(props: any) {
+  const shaderRef = useRef<THREE.ShaderMaterial | null>(null);
+  const { viewport } = useThree();
+  useFrame((state) => {
     if (shaderRef.current) {
       shaderRef.current.uniforms.uTime.value += 0.01;
+      shaderRef.current.uniforms.uMouse.value = state.pointer;
     }
   });
 
   return (
     <mesh {...props}>
-      <planeGeometry args={[windowSize.width, windowSize.height, 10]} />
+      <planeGeometry args={[viewport.width, viewport.height, 10]} />
       <shaderMaterial
         ref={shaderRef}
         fragmentShader={fragmentShader}
         vertexShader={vertexShader}
         uniforms={{
           uTime: { value: 0.0 },
+          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
         }}
       />
-      {/* <meshBasicMaterial color="red" /> */}
     </mesh>
   );
 }
 
 export default function Home() {
-  const [windowSize, setWindowSize] = useState<WindowSizeType>({
-    width: undefined,
-    height: undefined,
-  });
-  useEffect(() => {
-    function handleResize() {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    }
-    if (typeof window !== 'undefined') {
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
   return (
     <main className="h-screen">
-      <Canvas
-        orthographic
-        camera={{
-          left: windowSize.width ?? 0 / -2,
-          right: windowSize.width ?? 0 / 2,
-          top: windowSize.height ?? 0 / 2,
-          bottom: windowSize.height ?? 0 / -2,
-          near: 0.1,
-          far: 1000,
-          position: [0, 0, 100],
-        }}
-      >
+      <Canvas orthographic>
         <ambientLight intensity={Math.PI / 2} />
         <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-        <Box
-          props={{ position: [0, 0, -10] }}
-          windowSize={{ width: windowSize.width, height: windowSize.height }}
-        />
+        <Box props={{ position: [0, 0, -10] }} />
       </Canvas>
-      {/* {windowSize.width} x {windowSize.height} */}
     </main>
   );
 }
