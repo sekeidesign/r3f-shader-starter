@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
@@ -12,7 +12,7 @@ function Box(props: any) {
   useFrame((state) => {
     if (shaderRef.current) {
       shaderRef.current.uniforms.uTime.value += 0.01;
-      shaderRef.current.uniforms.uMouse.value = state.pointer;
+      shaderRef.current.uniforms.uPointer.value = state.pointer;
     }
   });
 
@@ -25,7 +25,7 @@ function Box(props: any) {
         vertexShader={vertexShader}
         uniforms={{
           uTime: { value: 0.0 },
-          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+          uPointer: { value: new THREE.Vector2(0.5, 0.5) },
         }}
       />
     </mesh>
@@ -38,7 +38,7 @@ export default function Home() {
       <Canvas orthographic>
         <ambientLight intensity={Math.PI / 2} />
         <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-        <Box props={{ position: [0, 0, -10] }} />
+        <Box props={{ position: [0, 0, 0] }} />
       </Canvas>
     </main>
   );
