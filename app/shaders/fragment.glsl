@@ -1,8 +1,6 @@
 uniform float uTime;
 varying vec2 vUv;
 uniform vec2 uPointer;
-uniform vec2 uResolution;
-uniform vec2 uOpacity;
 
 void main(void)
 {
@@ -11,6 +9,12 @@ void main(void)
     // Normalize the mouse coordinates
     vec2 pointer=(uPointer+1.)/2.;
     
-    vec4 color=vec4(pointer.x,pointer.y,1.,mix(.25,1.,uv.y));
-    gl_FragColor=color;
+    // Create a color based on the mouse position
+    vec3 color=vec3(0.);
+    color.r+=mix(.25,1.,vUv.x*pointer.x);
+    color.g+=mix(.25,1.,vUv.y*pointer.y);
+    color.b+=1.;
+    
+    vec4 outputColor=vec4(color,1.);
+    gl_FragColor=outputColor;
 }
