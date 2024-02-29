@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import fragmentShader from './shaders/fragment.glsl';
 import vertexShader from './shaders/vertex.glsl';
+import { ShaderMaterial } from 'three';
 
 type WindowSizeType = {
   width: number | undefined;
@@ -17,13 +18,23 @@ function Box({
   props: any;
   windowSize: WindowSizeType;
 }) {
-  console.log(fragmentShader);
+  const shaderRef = useRef<ShaderMaterial | null>(null);
+  useFrame(() => {
+    if (shaderRef.current) {
+      shaderRef.current.uniforms.uTime.value += 0.01;
+    }
+  });
+
   return (
     <mesh {...props}>
       <planeGeometry args={[windowSize.width, windowSize.height, 10]} />
       <shaderMaterial
+        ref={shaderRef}
         fragmentShader={fragmentShader}
         vertexShader={vertexShader}
+        uniforms={{
+          uTime: { value: 0.0 },
+        }}
       />
       {/* <meshBasicMaterial color="red" /> */}
     </mesh>
