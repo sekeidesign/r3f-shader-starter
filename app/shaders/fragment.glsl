@@ -1,6 +1,8 @@
-uniform float uTime;
 varying vec2 vUv;
+
+uniform float uTime;
 uniform vec2 uPointer;
+uniform float uOpacity;
 
 void main(void)
 {
@@ -15,6 +17,6 @@ void main(void)
     color.g+=mix(.25,1.,vUv.y*pointer.y);
     color.b+=1.;
     
-    vec4 outputColor=vec4(color,1.);
+    vec4 outputColor=vec4(color,uOpacity);
     gl_FragColor=outputColor;
 }
